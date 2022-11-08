@@ -3,6 +3,8 @@ package pl.coderslab;
 import pl.coderslab.entity.User;
 import pl.coderslab.entity.UserDao;
 
+import java.util.Arrays;
+
 public class Main {
     public static void main(String[] args) {
 
@@ -23,7 +25,12 @@ public class Main {
 //        System.out.println(user);
 //        userDao1.update(user);
 
-        userDao1.delete(2);
+//        userDao1.delete(2);
+
+        User[] all = userDao1.findAll();
+        for (User u : all) {
+            System.out.println(u);
+        }
 
 
     }

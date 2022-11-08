@@ -4,6 +4,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import pl.coderslab.DbUtil;
 
 import java.sql.*;
+import java.util.Arrays;
 
 public class UserDao {
 
@@ -12,6 +13,8 @@ public class UserDao {
     private static final String READ_USER_QUERY_BY_EMAIL = "SELECT * from users where email = ?";
     private static final String UPDATE_USER_QUERY = "UPDATE users set email = ?, username = ?, password = ? where id = ?";
     private static final String DELETE_USER_QUERY = "delete from users where id = ?";
+
+    private static final String READ_ALL_USERS = "select * from users";
 
     public String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
@@ -99,5 +102,33 @@ public class UserDao {
             e.printStackTrace();
         }
     }
+
+    public User[] findAll() {
+        User[] users = new User[0];
+        try (Connection conn = DbUtil.getConnection()) {
+
+            PreparedStatement statement = conn.prepareStatement(READ_ALL_USERS);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                User user = new User();
+                user.setUserId(resultSet.getInt("id"));
+                user.setEmail(resultSet.getString("email"));
+                user.setUserName(resultSet.getString("username"));
+                user.setPassword(resultSet.getString("password"));
+                users = addToArray(user, users);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+    private User[] addToArray(User u, User[] users) {
+        User[] tmpUsers = Arrays.copyOf(users, users.length + 1); // Tworzymy kopię tablicy powiększoną o 1.
+        tmpUsers[users.length] = u; // Dodajemy obiekt na ostatniej pozycji.
+        return tmpUsers; // Zwracamy nową tablicę.
+    }
+
 
 }
